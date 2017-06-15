@@ -1,13 +1,19 @@
 package automationFramework;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 
-public class LoggingTool {
+public class LoggingTool  {
 	private String logFileWithPath;
-	public LoggingTool(String logFileWithPath){
-		this.logFileWithPath = logFileWithPath;
+	public LoggingTool(String logFilepath, String logFileWithPath) throws IOException{
+		this.logFileWithPath = logFilepath + "/" + logFileWithPath;
+		
+		File folder = new File(logFilepath);
+        if (!folder.exists()) {
+        	folder.mkdir();
+	    }
 	}
 	/**
 	    * Writes a string to the log file and copies output to stdout, using a standard INF format
