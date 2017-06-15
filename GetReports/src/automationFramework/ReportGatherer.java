@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.NoSuchElementException;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -26,7 +25,6 @@ public class ReportGatherer {
 	
 	private String pathToLogFile;
 	private String logFileName = new Date().getTime() + "-log.txt";
-	private String envPath;
 	private String downloadBaseFilepath;
 	private HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
 	private ChromeOptions options = new ChromeOptions();
@@ -47,14 +45,14 @@ public class ReportGatherer {
 	    * @param int pwcolumnIndex The 0-indexed column containing printer passwords
 	    * @param int printerColumnIndex The 0-indexed column containing printer passwords
 	    */
-	public ReportGatherer(String env, String mfdList, String basePath, int ipColumnIndex, int pwColumnIndex, int printerColumnIndex){
+	public ReportGatherer(String mfdList, String basePath, int ipColumnIndex, int pwColumnIndex, int printerColumnIndex){
 		ipCol = ipColumnIndex;
 		pwCol = pwColumnIndex;
 		nameCol = printerColumnIndex;
 		downloadBaseFilepath = basePath;
-		pathToLogFile = basePath;
-		envPath = env;
-		System.setProperty("webdriver.chrome.driver", envPath + "Tools/chromedriver.exe");
+		pathToLogFile = basePath + "/log";
+		
+		System.setProperty("webdriver.chrome.driver", "tools/chromedriver.exe");
 		try {
 			reader = new ExcelReader(mfdList);
 		} catch (FileNotFoundException e) {
@@ -63,7 +61,13 @@ public class ReportGatherer {
 			e.printStackTrace();
 		}
 		length = reader.getRows();
-		logger = new LoggingTool(pathToLogFile + logFileName);
+		try{
+			logger = new LoggingTool(pathToLogFile, logFileName);
+			logger.logInfPrint("Initialized LoggingTool.");
+		}
+		catch(IOException e){
+			System.out.println("Couldn't create log file.");
+		}
 		
 	}
 	
@@ -185,19 +189,22 @@ public class ReportGatherer {
 	    *  @return int returns 0 on success, nonzero on an error
 	    */
 	private int mfdLoad(Context context){
-		context.webDriver.navigate().to("http://" + context.ipAddress + "/wcd/top.xml");
-		
 		try{
+			context.webDriver.navigate().to("http://" + context.ipAddress + "/wcd/top.xml");
+		}
+		
+		/*try{
 			WebElement error_message_element = context.webDriver.findElement(By.xpath("//*[@id=\"main-message\"]/div[2]"));
 			
 			if(error_message_element.getAttribute("jscontent") == "errorCode"){
 				logger.logErrPrint(context.ipAddress + " couldn't load login page");
+				return 1;
 			}
 		}
 		catch(NoSuchElementException e){
 			// Means we didn't hit an error page
 			System.out.print("");
-		}
+		}*/
 		catch(Exception e){
 			logger.logErrPrint(context.ipAddress + " couldn't load login page");
 			e.printStackTrace();
