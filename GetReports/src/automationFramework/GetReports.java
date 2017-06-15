@@ -27,20 +27,21 @@ public class GetReports {
         String downloadBasePath = workingFolder.getAbsolutePath();
         ReportGatherer gatherer = new ReportGatherer(listOfPrintersPath, downloadBasePath, 4, 6, 7);
 		
-        /*
+        
         //gatherer.length()
         int startMFD = 1;
-        int totalMFDs = 1;//gatherer.length();
-        final ArrayList<Integer> list = new ArrayList<Integer>();
+        int totalMFDs = gatherer.length();
+        final BlockingQueue<Integer> queue = new ArrayBlockingQueue<Integer>(totalMFDs);
         for(int currentMFD = startMFD; currentMFD <= totalMFDs; currentMFD++){
-			list.add(currentMFD);
+        	queue.add(currentMFD);
         }
 		
         ExecutorService pool = Executors.newFixedThreadPool(MAXCONCURRENTTHREADS);
-        for(final int mfd : list){
+        for(final int mfd : queue){
             pool.execute(new Runnable(){
                 public void run() {
                     gatherer.retrieveReportByIndex(mfd);
+                    
                 }
             });
         }
@@ -50,7 +51,8 @@ public class GetReports {
 			pool.awaitTermination(1, TimeUnit.MINUTES);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}*/
+		}
+        
 	     	
 
 		System.out.println("Retrieval complete.");
