@@ -2,15 +2,19 @@ package automationFramework;
 
 import java.io.File;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class GetReports {
 	
+	public static final int MAXCONCURRENTTHREADS = 2;
 
 	public static void main(String[] args) {
-		String envPath = "//cfs/apps/pcc/MFDAutomationEnv/";
 		
 		String listOfPrintersPath = "//cfs/it_general/units/ss/ITT2/_s/MFD/Reports/MasterReports_Spreadsheet_Archive/Master_Reports.xlsx";
 		
@@ -21,38 +25,34 @@ public class GetReports {
         }
                 
         String downloadBasePath = workingFolder.getAbsolutePath();
-        ReportGatherer gatherer = new ReportGatherer(envPath, listOfPrintersPath, downloadBasePath, 4, 6, 7);
+        ReportGatherer gatherer = new ReportGatherer(listOfPrintersPath, downloadBasePath, 4, 6, 7);
 		
-        new Thread(() -> {
-        	gatherer.retrieveReportByPrinterName("D6608");
-        }).start();
-        
-        Queue<Thread> queue = new LinkedList<Thread>();
+        /*
         //gatherer.length()
-
-		for(int currentMFD = 1; currentMFD < 6; currentMFD++){	
-			final int index = currentMFD;
-			
-			Thread thread = new Thread(() -> {
-	        	gatherer.retrieveReportByIndex(index);
-			});
-			
-			queue.offer(thread);
-	        thread.start();
-	        while(queue.size() > 2){
-	        	PublicTools.sleep(2000);
-	        	for (Thread t : queue) {
-	        		if(!t.isAlive()){
-	        			queue.remove(t);
-	        		}
-	        	}
-	        	
-	        }
-			
-			
-		}
+        int startMFD = 1;
+        int totalMFDs = 1;//gatherer.length();
+        final ArrayList<Integer> list = new ArrayList<Integer>();
+        for(int currentMFD = startMFD; currentMFD <= totalMFDs; currentMFD++){
+			list.add(currentMFD);
+        }
+		
+        ExecutorService pool = Executors.newFixedThreadPool(MAXCONCURRENTTHREADS);
+        for(final int mfd : list){
+            pool.execute(new Runnable(){
+                public void run() {
+                    gatherer.retrieveReportByIndex(mfd);
+                }
+            });
+        }
+        
+        pool.shutdown();
+        try {
+			pool.awaitTermination(1, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}*/
+	     	
 
 		System.out.println("Retrieval complete.");
-	}
-	
+	}	
 }
