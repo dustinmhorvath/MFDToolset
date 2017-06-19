@@ -28,9 +28,8 @@ public class GetReports {
         ReportGatherer gatherer = new ReportGatherer(listOfPrintersPath, downloadBasePath, 4, 6, 7);
 		
         
-        //gatherer.length()
         int startMFD = 1;
-        int totalMFDs = gatherer.length();
+        int totalMFDs = 4;//gatherer.length();
         final BlockingQueue<Integer> queue = new ArrayBlockingQueue<Integer>(totalMFDs);
         for(int currentMFD = startMFD; currentMFD <= totalMFDs; currentMFD++){
         	queue.add(currentMFD);
