@@ -2,51 +2,48 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/client-combined-3.4.0-nodeps.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/cglib-nodep-3.2.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/commons-codec-1.10.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/commons-exec-1.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/commons-io-2.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/commons-lang3-3.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/commons-logging-1.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/cssparser-0.9.22.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/gson-2.8.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/guava-21.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/hamcrest-core-1.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/htmlunit-2.26.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/htmlunit-core-js-2.26.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/htmlunit-driver-2.26.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/httpclient-4.5.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/httpcore-4.4.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/httpmime-4.5.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/javax.servlet-api-3.1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/jetty-io-9.4.1.v20170120.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/jetty-util-9.4.1.v20170120.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/jna-4.1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/jna-platform-4.1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/junit-4.12.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/neko-htmlunit-2.25.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/phantomjsdriver-1.4.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/sac-1.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/serializer-2.7.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/websocket-api-9.4.3.v20170317.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/websocket-client-9.4.3.v20170317.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/websocket-common-9.4.3.v20170317.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/xalan-2.7.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/xercesImpl-2.11.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/selenium-java-3.4.0/lib/xml-apis-1.4.01.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/poi-3.16.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/poi-examples-3.16.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/poi-excelant-3.16.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/poi-ooxml-3.16.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/poi-ooxml-schemas-3.16.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/poi-scratchpad-3.16.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/lib/commons-codec-1.10.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/lib/commons-collections4-4.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/lib/commons-logging-1.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/lib/junit-4.12.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/lib/log4j-1.2.17.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/ooxml-lib/curvesapi-1.04.jar"/>
-	<classpathentry exported="true" kind="lib" path="Y:/MFDAutomationEnv/Tools/poi-3.16/ooxml-lib/xmlbeans-2.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/cglib-nodep-3.2.4.jar"/>
+	<classpathentry kind="lib" path="lib/client-combined-3.4.0-nodeps.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections4-4.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-exec-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.5.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.5.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/cssparser-0.9.22.jar"/>
+	<classpathentry kind="lib" path="lib/curvesapi-1.04.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.8.0.jar"/>
+	<classpathentry kind="lib" path="lib/guava-21.0.jar"/>
+	<classpathentry kind="lib" path="lib/hamcrest-core-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/htmlunit-2.26.jar"/>
+	<classpathentry kind="lib" path="lib/htmlunit-core-js-2.26.jar"/>
+	<classpathentry kind="lib" path="lib/htmlunit-driver-2.26.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.5.3.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.4.6.jar"/>
+	<classpathentry kind="lib" path="lib/httpmime-4.5.3.jar"/>
+	<classpathentry kind="lib" path="lib/javax.servlet-api-3.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-io-9.4.1.v20170120.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-util-9.4.1.v20170120.jar"/>
+	<classpathentry kind="lib" path="lib/jna-4.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jna-platform-4.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/junit-4.12.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="lib/neko-htmlunit-2.25.jar"/>
+	<classpathentry kind="lib" path="lib/phantomjsdriver-1.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/poi-3.16.jar"/>
+	<classpathentry kind="lib" path="lib/poi-examples-3.16.jar"/>
+	<classpathentry kind="lib" path="lib/poi-excelant-3.16.jar"/>
+	<classpathentry kind="lib" path="lib/poi-ooxml-3.16.jar"/>
+	<classpathentry kind="lib" path="lib/poi-ooxml-schemas-3.16.jar"/>
+	<classpathentry kind="lib" path="lib/poi-scratchpad-3.16.jar"/>
+	<classpathentry kind="lib" path="lib/sac-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/serializer-2.7.2.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-api-9.4.3.v20170317.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-client-9.4.3.v20170317.jar"/>
+	<classpathentry kind="lib" path="lib/websocket-common-9.4.3.v20170317.jar"/>
+	<classpathentry kind="lib" path="lib/xalan-2.7.2.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl-2.11.0.jar"/>
+	<classpathentry kind="lib" path="lib/xml-apis-1.4.01.jar"/>
+	<classpathentry kind="lib" path="lib/xmlbeans-2.6.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

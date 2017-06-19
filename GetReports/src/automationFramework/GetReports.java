@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class GetReports {
 	
-	public static final int MAXCONCURRENTTHREADS = 4;
+	public static final int MAXCONCURRENTTHREADS = 8;
 
 	public static void main(String[] args) {
 		
@@ -27,7 +27,7 @@ public class GetReports {
         ReportGatherer gatherer = new ReportGatherer(listOfPrintersPath, downloadBasePath, 4, 6, 7);
 		        
         int startMFD = 1;
-        int totalMFDs = 4;//gatherer.length();
+        int totalMFDs = 8;//gatherer.length();
         final BlockingQueue<Integer> queue = new ArrayBlockingQueue<Integer>(totalMFDs);
         for(int currentMFD = startMFD; currentMFD <= totalMFDs; currentMFD++){
         	queue.add(currentMFD);
