@@ -10,6 +10,7 @@ import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
+import org.apache.xmlbeans.impl.common.Mutex;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -39,6 +40,7 @@ public class ReportGatherer {
 	private int pwCol;
 	private int nameCol;
 	private LoggingTool logger;
+	private Mutex webDriverLock;
 	FileAlterationMonitor monitor;
 	
 	/**
@@ -57,6 +59,7 @@ public class ReportGatherer {
 		downloadBaseFilepath = basePath;
 		pathToLogFile = basePath + "/log";
 		monitor = new FileAlterationMonitor(POLL_INTERVAL);
+		webDriverLock = new Mutex();
 		
 		try {
 			monitor.start();
@@ -89,9 +92,12 @@ public class ReportGatherer {
 	    */
 	public void retrieveReportByIndex(int index){
 		String printerName = reader.getValueAt(index, nameCol);
-		Context context = getContext(index, printerName);
+		Context context;
+		synchronized(webDriverLock){
+			context = getContext(index, printerName);
+			logger.logInfPrint(context.ipAddress + " " + context.printerName + " started");
+		}
 		
-		logger.logInfPrint(context.ipAddress + " " + context.printerName + " started");
 		if(mfdLoad(context) > 0) {
 			destroyContext(context);
 			return;	
