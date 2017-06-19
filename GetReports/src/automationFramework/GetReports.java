@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class GetReports {
 	
-	public static final int MAXCONCURRENTTHREADS = 8;
+	public static final int MAXCONCURRENTTHREADS = 6;
 
 	public static void main(String[] args) {
 		
@@ -24,34 +24,44 @@ public class GetReports {
         }
                 
         String downloadBasePath = workingFolder.getAbsolutePath();
-        ReportGatherer gatherer = new ReportGatherer(listOfPrintersPath, downloadBasePath, 4, 6, 7);
-		        
-        int startMFD = 1;
-        int totalMFDs = 8;//gatherer.length();
-        final BlockingQueue<Integer> queue = new ArrayBlockingQueue<Integer>(totalMFDs);
-        for(int currentMFD = startMFD; currentMFD <= totalMFDs; currentMFD++){
-        	queue.add(currentMFD);
-        }
+
 		
-        CountDownLatch latch = new CountDownLatch(totalMFDs);
-        ExecutorService pool = Executors.newFixedThreadPool(MAXCONCURRENTTHREADS);
-        for(final int mfd : queue){
-            pool.execute(new Runnable(){
-                public void run() {
-                    gatherer.retrieveReportByIndex(mfd);
-                    latch.countDown();
-                }
-            });
-        	
-        }
+		ReportGatherer gatherer;
+		try {
+			gatherer = new ReportGatherer(listOfPrintersPath, downloadBasePath, 4, 6, 7);
+		
+			int totalMFDs = gatherer.length();
+			
+			int startMFD = 1;
+	        final BlockingQueue<Integer> queue = new ArrayBlockingQueue<Integer>(totalMFDs);
+	        for(int currentMFD = startMFD; currentMFD <= totalMFDs; currentMFD++){
+	        	queue.add(currentMFD);
+	        }
+		
+	        CountDownLatch latch = new CountDownLatch(totalMFDs);
+	        ExecutorService pool = Executors.newFixedThreadPool(MAXCONCURRENTTHREADS);
+	        for(final int mfd : queue){
+	            pool.execute(new Runnable(){
+	                public void run() {
+	                    gatherer.retrieveReportByIndex(mfd);
+	                    latch.countDown();
+	                }
+	            });
+	        }
         
-        pool.shutdown();
-        try {
-        	latch.await();
-			pool.awaitTermination(1, TimeUnit.MINUTES);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+        
+	        pool.shutdown();
+	        latch.await();
+	        pool.awaitTermination(1, TimeUnit.MINUTES);
+        
+        }
+    	catch (InterruptedException e) {
+			System.out.println("ERROR ExecutorService/CountDownLatch failed.");
 		}
+		catch (Exception e) {
+			System.out.println("ERROR Could not initialize gatherer");
+		}
+		
 
 		System.out.println("Retrieval complete.");
 	}	

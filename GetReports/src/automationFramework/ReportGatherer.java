@@ -24,7 +24,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ReportGatherer {
 	
-	private static final long POLL_INTERVAL = 10;
+	// Used for webDriver timeout intervals, in seconds
 	private static int LONGWAIT = 20;
 	private static int SHORTWAIT = 3;
 	
@@ -45,35 +45,31 @@ public class ReportGatherer {
 	
 	/**
 	    * Constructs a ReportGatherer and opens the excel file provided
-	    * @param env The root filepath to the development environment where webdriver tools can be found
 	    * @param mfdList Absolute path, including filename, of the excel sheet
 	    * @param basePath The root filepath to which reports will be downloaded
 	    * @param int ipColumnIndex The 0-indexed column containing printer IPs
 	    * @param int pwcolumnIndex The 0-indexed column containing printer passwords
 	    * @param int printerColumnIndex The 0-indexed column containing printer passwords
+	 * @throws Exception 
 	    */
-	public ReportGatherer(String mfdList, String basePath, int ipColumnIndex, int pwColumnIndex, int printerColumnIndex){
+	public ReportGatherer(String mfdList, String basePath, int ipColumnIndex, int pwColumnIndex, int printerColumnIndex) throws Exception{
 		ipCol = ipColumnIndex;
 		pwCol = pwColumnIndex;
 		nameCol = printerColumnIndex;
 		downloadBaseFilepath = basePath;
 		pathToLogFile = basePath + "/log";
-		monitor = new FileAlterationMonitor(POLL_INTERVAL);
+		monitor = new FileAlterationMonitor();
 		webDriverLock = new Mutex();
-		
-		try {
-			monitor.start();
-		} catch (Exception e) {
-			logger.logErrPrint("Couldn't initialize FileAlterationMonitor");
-		}
+				
+		monitor.start();
 		
 		System.setProperty("webdriver.chrome.driver", "tools/chromedriver.exe");
 		try {
 			reader = new ExcelReader(mfdList);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			throw new Exception("Couldn't find filelist");
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new Exception("Error opening filelist");
 		}
 		length = reader.getRows();
 		try{
@@ -81,8 +77,9 @@ public class ReportGatherer {
 			logger.logInfPrint("Initialized LoggingTool.");
 		}
 		catch(IOException e){
-			System.out.println("Couldn't create log file.");
+			throw new IOException("ERROR Couldn't create log file.");
 		}
+		
 		
 	}
 	
@@ -95,27 +92,28 @@ public class ReportGatherer {
 		Context context;
 		synchronized(webDriverLock){
 			context = getContext(index, printerName);
+			logger.logInfPrint(Thread.currentThread().toString() + " started");
 			logger.logInfPrint(context.ipAddress + " " + context.printerName + " started");
 		}
 		
-		if(mfdLoad(context) > 0) {
+		if(preliminary_mfdLoad(context) > 0) {
 			destroyContext(context);
 			return;	
 		}
-		if(mfdLogin(context) > 0) {
+		if(loginPage_mfdLogin(context) > 0) {
 			destroyContext(context);
 			return;
 		}
 		
-		if(mfdImportExport(context) == 0){
-			if(mfdCounterMenu(context) == 0){
-				if(mfdUserCounterSelection(context) == 0){
-					mfdDownloadButton(context);
+		if(adminSystemPage_mfdImportExport(context) == 0){
+			if(importExport_mfdCounterMenu(context) == 0){
+				if(counterExportMenu_mfdUserCounterSelection(context) == 0){
+					downloadScreen_mfdDownloadButton(context);
 				}
 			}
-			if(mfdCounterMenu(context) == 0){
-				if(mfdAccountCounterSelection(context) == 0){
-					mfdDownloadButton(context);
+			if(importExport_mfdCounterMenu(context) == 0){
+				if(counterExportMenu_mfdAccountCounterSelection(context) == 0){
+					downloadScreen_mfdDownloadButton(context);
 				}
 			}
 		}
@@ -125,7 +123,7 @@ public class ReportGatherer {
 	}
 	
 	/**
-	    * Loads, logs in, navigates, downloads, and logs out from a single MFD, provided via its printer name int he excel sheet.
+	    * Loads, logs in, navigates, downloads, and logs out from a single MFD, provided via its printer name in the excel sheet.
 	    * @param name Printer name of the MFD within the excel sheet.
 	    */
 	public void retrieveReportByPrinterName(String name){
@@ -176,7 +174,6 @@ public class ReportGatherer {
 	    options.setExperimentalOption("prefs", chromePrefs);
 	    options.addArguments("--test-type");
 	    
-	    
 	    cap.setCapability(ChromeOptions.CAPABILITY, chromeOptionsMap);
 	    cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 	    cap.setCapability(ChromeOptions.CAPABILITY, options);
@@ -206,7 +203,7 @@ public class ReportGatherer {
 	    *  @param context A context containing relevant printer information
 	    *  @return int returns 0 on success, nonzero on an error
 	    */
-	private int mfdLoad(Context context){
+	private int preliminary_mfdLoad(Context context){
 		try{
 			context.webDriver.navigate().to("http://" + context.ipAddress + "/wcd/top.xml");
 		}
@@ -237,7 +234,7 @@ public class ReportGatherer {
 	    *  @param context A context containing relevant printer information
 	    *  @return int returns 0 on success, nonzero on an error
 	    */
-	private int mfdLogin(Context context){
+	private int loginPage_mfdLogin(Context context){
 		try{
 			WebElement adminButton = context.webDriver.findElement(By.id("Admin"));
 			adminButton.click();
@@ -248,12 +245,14 @@ public class ReportGatherer {
 			WebElement passwordField = context.webDriver.findElement(By.id("Admin_Pass"));
 			passwordField.sendKeys(context.pwString);
 			passwordField.sendKeys(Keys.RETURN);
-			PublicTools.sleep();
 			
-			if(!context.webDriver.getCurrentUrl().toLowerCase().contains("a_system") ){
+			/*PublicTools.sleep();
+			
+			if(!context.waitShort.getCurrentUrl().toLowerCase().contains("a_system") ){
 				logger.logErrPrint(context.ipAddress + " couldn't reach system page");
 				return 1;
-			}
+			}*/
+			
 		
 		}
 		catch(Exception e){
@@ -271,7 +270,7 @@ public class ReportGatherer {
 	    *  @param context A context containing relevant printer information
 	    *  @return int returns 0 on success, nonzero on an error
 	    */
-	private int mfdImportExport(Context context){
+	private int adminSystemPage_mfdImportExport(Context context){
 		try{
 			context.waitLong.until(ExpectedConditions.elementToBeClickable(By.linkText("Import/Export"))).click();	
 		}
@@ -312,7 +311,7 @@ public class ReportGatherer {
 	    *  @param index The row index of the MFD within the excel sheet, starting at index 0, which is row B. Used for finding the ip for logging.
 	    *  @return Returns 0 on success, nonzero on an error.
 	    */
-	private int mfdCounterMenu(Context context){
+	private int importExport_mfdCounterMenu(Context context){
 		// Click on "counter"
 		try{
 			context.waitLong.until(ExpectedConditions.elementToBeClickable(By.id("R_SEL3"))).click();
@@ -340,7 +339,7 @@ public class ReportGatherer {
 	    *  @param context A context containing relevant printer information
 	    *  @return int returns 0 on success, nonzero on an error
 	    */
-	private int mfdUserCounterSelection(Context context){
+	private int counterExportMenu_mfdUserCounterSelection(Context context){
 		// Click on "User Counter"
 		try{
 			context.waitShort.until(ExpectedConditions.elementToBeClickable(By.id("R_SEL_C2Export"))).click();
@@ -369,7 +368,7 @@ public class ReportGatherer {
 	    *  @param context A context containing relevant printer information
 	    *  @return int returns 0 on success, nonzero on an error
 	    */
-	private int mfdAccountCounterSelection(Context context){
+	private int counterExportMenu_mfdAccountCounterSelection(Context context){
 		// Click on "User Counter"
 		try{
 			context.waitShort.until(ExpectedConditions.elementToBeClickable(By.id("R_SEL_C3Export"))).click();
@@ -400,8 +399,7 @@ public class ReportGatherer {
 	    *  @param context A context containing relevant printer information.
 	    *  @return int returns 0 on success, nonzero on an error.
 	    */
-	private int mfdDownloadButton(Context context){
-		logger.logInfPrint(Thread.currentThread().toString());
+	private int downloadScreen_mfdDownloadButton(Context context){
 		final Boolean[] flag = new Boolean[1];
 		flag[0] = false;
 
@@ -432,7 +430,11 @@ public class ReportGatherer {
 				break;
 			}
 			else{
-				PublicTools.sleep(interval * 1000);
+				try {
+					Thread.sleep(interval * 1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		
