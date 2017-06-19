@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.apache.commons.io.monitor.FileAlterationListener;
+import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
+import org.apache.commons.io.monitor.FileAlterationMonitor;
+import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -19,9 +23,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ReportGatherer {
 	
+	private static final long POLL_INTERVAL = 10;
 	private static int LONGWAIT = 20;
 	private static int SHORTWAIT = 3;
-	private static int FILECHANGEINTERVAL = 5;
 	
 	private String pathToLogFile;
 	private String logFileName = new Date().getTime() + "-log.txt";
@@ -35,6 +39,7 @@ public class ReportGatherer {
 	private int pwCol;
 	private int nameCol;
 	private LoggingTool logger;
+	FileAlterationMonitor monitor;
 	
 	/**
 	    * Constructs a ReportGatherer and opens the excel file provided
@@ -51,6 +56,13 @@ public class ReportGatherer {
 		nameCol = printerColumnIndex;
 		downloadBaseFilepath = basePath;
 		pathToLogFile = basePath + "/log";
+		monitor = new FileAlterationMonitor(POLL_INTERVAL);
+		
+		try {
+			monitor.start();
+		} catch (Exception e) {
+			logger.logErrPrint("Couldn't initialize FileAlterationMonitor");
+		}
 		
 		System.setProperty("webdriver.chrome.driver", "tools/chromedriver.exe");
 		try {
@@ -367,7 +379,7 @@ public class ReportGatherer {
 			
 		}
 		catch(Exception e){
-			logger.logErrPrint(context.ipAddress + " failed to find Account Counter");
+			logger.logInfPrint(context.ipAddress + " failed to find Account Counter");
 			return 1;
 		}
 		
@@ -375,12 +387,30 @@ public class ReportGatherer {
 		return 0;
 	}
 	
+	
+	
 	/**
 	    *  Hits the download button, downloads the file, waits, then hits the back button.
 	    *  @param context A context containing relevant printer information.
 	    *  @return int returns 0 on success, nonzero on an error.
 	    */
 	private int mfdDownloadButton(Context context){
+		logger.logInfPrint(Thread.currentThread().toString());
+		final Boolean[] flag = new Boolean[1];
+		flag[0] = false;
+
+		FileAlterationObserver observer = new FileAlterationObserver(downloadBaseFilepath + "/" + context.printerName);
+		FileAlterationListener listener = new FileAlterationListenerAdaptor() {
+		    public void onFileChange(File file) {
+		    	if(file.getName().endsWith(".txt")){
+		    		flag[0] = true;
+		    	}
+		    }
+		};
+		
+		observer.addListener(listener);
+		monitor.addObserver(observer);
+		
 		try{		    
 			context.waitLong.until(ExpectedConditions.elementToBeClickable(By.id("btnEXE"))).click();
 		}
@@ -388,21 +418,24 @@ public class ReportGatherer {
 			logger.logErrPrint(context.ipAddress + " failed to find download button");
 			return 1;
 		}
-
-		long filesize1 = 0;
-		long filesize2 = 0;
-		PublicTools.sleep(FILECHANGEINTERVAL * 1000);
-		File f = PublicTools.lastFileModified(downloadBaseFilepath + "/" + context.printerName);
 		
-		do {
-			filesize1 = f.length();  // check file size
-			PublicTools.sleep(5000);      // wait for 5 seconds
-			filesize2 = f.length();  // check file size again
-
-			} while (filesize1 != filesize2); 
+		int interval = 2;
+		int attempts = 10;
+		for(int i = 0; i < attempts; i++){
+			if(flag[0]){
+				break;
+			}
+			else{
+				PublicTools.sleep(interval * 1000);
+			}
+		}
+		
+		monitor.removeObserver(observer);
+		observer.removeListener(listener);
 		
 		try{
 			context.waitLong.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"btnOK\"]"))).click();
+			return 0;
 		}
 		catch(Exception e1){
 			try{
@@ -413,9 +446,8 @@ public class ReportGatherer {
 				return 1;
 			}
 		}
-		
-		logger.logInfPrint(context.ipAddress + " download complete");
-		return 0;
+				
+		return 1;
 	}
 	
 	/**
