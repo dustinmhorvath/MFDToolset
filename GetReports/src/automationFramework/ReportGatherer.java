@@ -425,8 +425,8 @@ public class ReportGatherer {
 			return 1;
 		}
 		
-		int interval = 2;
-		int attempts = 10;
+		int interval = 1;
+		int attempts = 20;
 		for(int i = 0; i < attempts; i++){
 			if(flag[0]){
 				break;
