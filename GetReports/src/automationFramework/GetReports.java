@@ -25,8 +25,7 @@ public class GetReports {
                 
         String downloadBasePath = workingFolder.getAbsolutePath();
         ReportGatherer gatherer = new ReportGatherer(listOfPrintersPath, downloadBasePath, 4, 6, 7);
-		
-        
+		        
         int startMFD = 1;
         int totalMFDs = 4;//gatherer.length();
         final BlockingQueue<Integer> queue = new ArrayBlockingQueue<Integer>(totalMFDs);
@@ -34,9 +33,8 @@ public class GetReports {
         	queue.add(currentMFD);
         }
 		
-        ExecutorService pool = Executors.newFixedThreadPool(MAXCONCURRENTTHREADS);
         CountDownLatch latch = new CountDownLatch(totalMFDs);
-        
+        ExecutorService pool = Executors.newFixedThreadPool(MAXCONCURRENTTHREADS);
         for(final int mfd : queue){
             pool.execute(new Runnable(){
                 public void run() {
@@ -49,8 +47,8 @@ public class GetReports {
         
         pool.shutdown();
         try {
+        	latch.await();
 			pool.awaitTermination(1, TimeUnit.MINUTES);
-			latch.await();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

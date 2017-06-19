@@ -89,9 +89,9 @@ public class ReportGatherer {
 	    */
 	public void retrieveReportByIndex(int index){
 		String printerName = reader.getValueAt(index, nameCol);
-
-		logger.logInfPrint("NEW");
 		Context context = getContext(index, printerName);
+		
+		logger.logInfPrint(context.ipAddress + " " + context.printerName + " started");
 		if(mfdLoad(context) > 0) {
 			destroyContext(context);
 			return;	
