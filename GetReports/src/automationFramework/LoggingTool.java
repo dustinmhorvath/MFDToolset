@@ -2,20 +2,38 @@ package automationFramework;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public class LoggingTool  {
 	private String logFileWithPath;
+	private String failureLogFileWithPath;
+	private PrintWriter logWriter;
+	private PrintWriter failWriter;
+	
 	public LoggingTool(String logFilepath, String logFileWithPath) throws IOException{
-		this.logFileWithPath = logFilepath + "/" + logFileWithPath;
+		this.logFileWithPath = logFilepath + "/" + new Date().getTime() + "-" + logFileWithPath;
+		this.failureLogFileWithPath = logFilepath + "/" + new Date().getTime() + "retry.log";
 		
 		File folder = new File(logFilepath);
         if (!folder.exists()) {
         	folder.mkdir();
 	    }
+        FileWriter fwl = new FileWriter( this.logFileWithPath , true);
+		logWriter = new PrintWriter(fwl);
+	}
+	
+	public void close(){
+		if(logWriter != null){
+			logWriter.close();
+		}
+		if(failWriter != null){
+			failWriter.close();
+		}
 	}
 	
 	/**
@@ -44,6 +62,14 @@ public class LoggingTool  {
 		}
 	}
 	
+	public void logFailPrint(String string) {
+		try {
+			writeToFailLogFile(string);
+		} catch (IOException e) {
+			System.out.println("Failed to write to retry log");
+		}
+	}
+	
 	/**
 	    * Writes a string to the log file and copies output to stdout, using a standard format
 	    * @param logLine the string to be written to the log
@@ -64,11 +90,19 @@ public class LoggingTool  {
 	 * @throws FileNotFoundException 
 	    */
 	private void writeToLogFile(String logLine) throws FileNotFoundException, UnsupportedEncodingException{
+	    logWriter.println(logLine);
+		logWriter.flush();
+	}
+	
+	private void writeToFailLogFile(String logLine) throws IOException{
+		if(failWriter == null){
+			FileWriter fwf = new FileWriter( this.failureLogFileWithPath , true);
+			failWriter = new PrintWriter(fwf);
+			logInfPrint("Initialized failWriter");
+		}
 		
-	    PrintWriter writer = new PrintWriter(logFileWithPath, "UTF-8");
-	    writer.println(logLine);
-	    writer.close();
-		    
+	    failWriter.println(logLine);
+		failWriter.flush();
 	}
 	
 	/**
@@ -78,4 +112,6 @@ public class LoggingTool  {
 	private String getLogPrefix(){
 		return LocalDateTime.now() + "  : ";
 	}
+
+	
 }

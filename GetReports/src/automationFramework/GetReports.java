@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class GetReports {
 	
+	// The maximum number of browser windows this application will be allowed to run concurrently
 	public static final int MAXCONCURRENTTHREADS = 6;
 
 	public static void main(String[] args) {
@@ -52,7 +53,8 @@ public class GetReports {
         
 	        pool.shutdown();
 	        latch.await();
-	        pool.awaitTermination(1, TimeUnit.MINUTES);
+	        pool.awaitTermination(30, TimeUnit.SECONDS);
+			gatherer.close();
         
         }
     	catch (InterruptedException e) {
@@ -61,6 +63,7 @@ public class GetReports {
 		catch (Exception e) {
 			System.out.println("ERROR Could not initialize gatherer");
 		}
+		
 		
 
 		System.out.println("Retrieval complete.");

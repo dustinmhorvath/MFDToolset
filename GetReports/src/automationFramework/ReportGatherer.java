@@ -3,7 +3,6 @@ package automationFramework;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.io.monitor.FileAlterationListener;
@@ -29,7 +28,7 @@ public class ReportGatherer {
 	private static int SHORTWAIT = 3;
 	
 	private String pathToLogFile;
-	private String logFileName = new Date().getTime() + "-log.txt";
+	private String logFileName = "log.txt";
 	private String downloadBaseFilepath;
 	private HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
 	private ChromeOptions options = new ChromeOptions();
@@ -45,14 +44,14 @@ public class ReportGatherer {
 	
 	/**
 	    * Constructs a ReportGatherer and opens the excel file provided
-	    * @param mfdList Absolute path, including filename, of the excel sheet
-	    * @param basePath The root filepath to which reports will be downloaded
-	    * @param int ipColumnIndex The 0-indexed column containing printer IPs
-	    * @param int pwcolumnIndex The 0-indexed column containing printer passwords
-	    * @param int printerColumnIndex The 0-indexed column containing printer passwords
-	 * @throws Exception 
+	    * @param String Absolute path, including filename, of the excel sheet
+	    * @param String The root filepath to which reports will be downloaded
+	    * @param Integer The 0-indexed column containing printer IPs
+	    * @param Integer The 0-indexed column containing printer passwords
+	    * @param Integer The 0-indexed column containing printer names
+	    * @throws Exception 
 	    */
-	public ReportGatherer(String mfdList, String basePath, int ipColumnIndex, int pwColumnIndex, int printerColumnIndex) throws Exception{
+	public ReportGatherer(String mfdList, String basePath, int ipColumnIndex, int pwColumnIndex, int printerColumnIndex) throws Exception  {
 		ipCol = ipColumnIndex;
 		pwCol = pwColumnIndex;
 		nameCol = printerColumnIndex;
@@ -67,9 +66,9 @@ public class ReportGatherer {
 		try {
 			reader = new ExcelReader(mfdList);
 		} catch (FileNotFoundException e) {
-			throw new Exception("Couldn't find filelist");
+			throw new FileNotFoundException("Couldn't find filelist");
 		} catch (IOException e) {
-			throw new Exception("Error opening filelist");
+			throw new IOException("Error opening filelist");
 		}
 		length = reader.getRows();
 		try{
@@ -83,6 +82,15 @@ public class ReportGatherer {
 		
 	}
 	
+	public void close(){
+		try {
+			monitor.stop();
+		} catch (Exception e) {
+			logger.logErrPrint("Monitor failed to shutdown");
+		}
+		logger.close();
+	}
+	
 	/**
 	    * Loads, logs in, navigates, downloads, and logs out from a single MFD, provided via its row index within the excel sheet
 	    * @param index the row index of the MFD within the excel sheet, starting at index 0, which is row B.
@@ -90,36 +98,40 @@ public class ReportGatherer {
 	public void retrieveReportByIndex(int index){
 		String printerName = reader.getValueAt(index, nameCol);
 		Context context;
+		boolean success = false;
+		
 		synchronized(webDriverLock){
 			context = getContext(index, printerName);
 			logger.logInfPrint(Thread.currentThread().toString() + " started");
 			logger.logInfPrint(context.ipAddress + " " + context.printerName + " started");
 		}
 		
-		if(preliminary_mfdLoad(context) > 0) {
-			destroyContext(context);
-			return;	
-		}
-		if(loginPage_mfdLogin(context) > 0) {
-			destroyContext(context);
-			return;
+		if(preliminary_mfdLoad(context) == 0) {
+			if(loginPage_mfdLogin(context) == 0) {
+				if(adminSystemPage_mfdImportExport(context) == 0){
+					if(importExport_mfdCounterMenu(context) == 0){
+						if(counterExportMenu_mfdUserCounterSelection(context) == 0){
+							if(downloadScreen_mfdDownloadButton(context) == 0){
+								success = true;
+							}
+						}
+					}
+					if(importExport_mfdCounterMenu(context) == 0){
+						if(counterExportMenu_mfdAccountCounterSelection(context) == 0){
+							if(downloadScreen_mfdDownloadButton(context) == 0){
+								success = true;
+							}
+						}
+					}
+				}
+				mfdLogout(context);
+			}
 		}
 		
-		if(adminSystemPage_mfdImportExport(context) == 0){
-			if(importExport_mfdCounterMenu(context) == 0){
-				if(counterExportMenu_mfdUserCounterSelection(context) == 0){
-					downloadScreen_mfdDownloadButton(context);
-				}
-			}
-			if(importExport_mfdCounterMenu(context) == 0){
-				if(counterExportMenu_mfdAccountCounterSelection(context) == 0){
-					downloadScreen_mfdDownloadButton(context);
-				}
-			}
-		}
-		
-		mfdLogout(context);
 		destroyContext(context);
+		if(!success){
+			logger.logFailPrint(String.valueOf(index));
+		}
 	}
 	
 	/**
