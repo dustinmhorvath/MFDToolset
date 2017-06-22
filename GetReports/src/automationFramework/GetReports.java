@@ -48,7 +48,7 @@ public class GetReports {
 			}
 			else{
 				int startMFD = 1;
-				totalMFDs = gatherer.length();
+				totalMFDs = gatherer.getFileLength();
 				queue = new ArrayBlockingQueue<Integer>(totalMFDs);
 		        for(int currentMFD = startMFD; currentMFD <= totalMFDs; currentMFD++){
 		        	queue.add(currentMFD);

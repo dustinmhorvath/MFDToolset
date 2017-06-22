@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-public class LoggingTool  {
+public class LoggingTool {
 	private String logName = "log.txt";
 	private String logPath;
 	private String logFileWithPath;
@@ -20,7 +20,7 @@ public class LoggingTool  {
 	private PrintWriter logWriter;
 	private PrintWriter failWriter;
 	
-	public LoggingTool(String logFilepath) throws IOException{
+	public LoggingTool(String logFilepath) throws IOException {
 		this.logPath = logFilepath;
 		this.logFileWithPath = logFilepath + "/" + new Date().getTime() + "-" + logName;
 		this.failureLogFileWithPath = logFilepath + "/" + new Date().getTime() + "-" + retryLogName;
@@ -119,7 +119,7 @@ public class LoggingTool  {
 		return LocalDateTime.now() + "  : ";
 	}
 	
-	public ArrayList<String> getLatestRetry() throws FileNotFoundException  {
+	public ArrayList<String> getLatestRetry() throws Exception  {
 		File folder = new File(logPath);
 		File[] listOfAllLogFiles = folder.listFiles();
 		ArrayList<String> listOfAllRetryFiles = new ArrayList<String>();
@@ -144,10 +144,13 @@ public class LoggingTool  {
 		Scanner scanner = new Scanner(new File(logPath + "/" + latestRetryFileString));
 		ArrayList<String> retryValues = new ArrayList<String>();
 		while(scanner.hasNextInt()){
-		    retryValues.add(scanner.next());
+			String val = scanner.next().trim();
+		    if(val.length() > 0){
+		    	retryValues.add(val);
+		    }
 		}
 		
-		scanner.close();
+		//scanner.close();
 		
 		return retryValues;
 	}

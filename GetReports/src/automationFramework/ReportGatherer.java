@@ -22,7 +22,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class ReportGatherer {
+public class ReportGatherer implements AutoCloseable {
 	
 	// Used for webDriver timeout intervals, in seconds
 	private static int LONGWAIT = 20;
@@ -41,7 +41,7 @@ public class ReportGatherer {
 	private LoggingTool logger;
 	private Mutex webDriverLock;
 	private FileAlterationMonitor monitor;
-	private ArrayList<String> retryList; 
+	private ArrayList<String> retryList = null; 
 	
 	/**
 	    * Constructs a ReportGatherer and opens the excel file provided
@@ -84,6 +84,9 @@ public class ReportGatherer {
 		
 	}
 	
+	/**
+	    * Closes the monitor and logger.
+	    */
 	public void close(){
 		try {
 			monitor.stop();
@@ -406,8 +409,6 @@ public class ReportGatherer {
 		return 0;
 	}
 	
-	
-	
 	/**
 	    *  Hits the download button, downloads the file, waits, then hits the back button.
 	    *  @param context A context containing relevant printer information.
@@ -491,7 +492,7 @@ public class ReportGatherer {
 		return 0;
 	}
 
-	public int length(){
+	public int getFileLength(){
 		return length;
 	}
 	
@@ -506,15 +507,16 @@ public class ReportGatherer {
 		try {
 			retryList = logger.getLatestRetry();
 		} catch (Exception e) {
-			e.printStackTrace();
+			retryList = null;
 		}
 	}
 	
 	public boolean hasRetries(){
-		if(retryList != null && retryList.isEmpty()){
+		if(retryList == null || retryList.isEmpty()){
 			return false;
 		}
-		else return true;
+
+		return true;
 	}
 
 }
