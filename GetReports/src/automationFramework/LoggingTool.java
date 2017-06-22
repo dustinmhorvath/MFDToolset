@@ -7,17 +7,23 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Scanner;
 
 public class LoggingTool  {
+	private String logName = "log.txt";
+	private String logPath;
 	private String logFileWithPath;
+	private String retryLogName = "retry.txt";
 	private String failureLogFileWithPath;
 	private PrintWriter logWriter;
 	private PrintWriter failWriter;
 	
-	public LoggingTool(String logFilepath, String logFileWithPath) throws IOException{
-		this.logFileWithPath = logFilepath + "/" + new Date().getTime() + "-" + logFileWithPath;
-		this.failureLogFileWithPath = logFilepath + "/" + new Date().getTime() + "retry.log";
+	public LoggingTool(String logFilepath) throws IOException{
+		this.logPath = logFilepath;
+		this.logFileWithPath = logFilepath + "/" + new Date().getTime() + "-" + logName;
+		this.failureLogFileWithPath = logFilepath + "/" + new Date().getTime() + "-" + retryLogName;
 		
 		File folder = new File(logFilepath);
         if (!folder.exists()) {
@@ -62,7 +68,7 @@ public class LoggingTool  {
 		}
 	}
 	
-	public void logFailPrint(String string) {
+	public void logFailRetryPrint(String string) {
 		try {
 			writeToFailLogFile(string);
 		} catch (IOException e) {
@@ -111,6 +117,39 @@ public class LoggingTool  {
 	    */
 	private String getLogPrefix(){
 		return LocalDateTime.now() + "  : ";
+	}
+	
+	public ArrayList<String> getLatestRetry() throws FileNotFoundException  {
+		File folder = new File(logPath);
+		File[] listOfAllLogFiles = folder.listFiles();
+		ArrayList<String> listOfAllRetryFiles = new ArrayList<String>();
+		
+		for(int i = 0; i < listOfAllLogFiles.length; i++){
+		    String filename = listOfAllLogFiles[i].getName();
+		    if(filename.endsWith(retryLogName)){
+		    	listOfAllRetryFiles.add(filename);
+		    }
+		}
+		
+		long latest = 0;
+		String latestRetryFileString = null;
+		for(int i = 0; i < listOfAllRetryFiles.size(); i++){
+			long timestamp = Long.parseLong(listOfAllRetryFiles.get(i).substring(0, 13));
+			if(timestamp > latest){
+				latest = timestamp;
+				latestRetryFileString = listOfAllRetryFiles.get(i);
+			}
+		}
+		
+		Scanner scanner = new Scanner(new File(logPath + "/" + latestRetryFileString));
+		ArrayList<String> retryValues = new ArrayList<String>();
+		while(scanner.hasNextInt()){
+		    retryValues.add(scanner.next());
+		}
+		
+		scanner.close();
+		
+		return retryValues;
 	}
 
 	

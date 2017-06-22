@@ -3,6 +3,7 @@ package automationFramework;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.io.monitor.FileAlterationListener;
@@ -28,7 +29,6 @@ public class ReportGatherer {
 	private static int SHORTWAIT = 3;
 	
 	private String pathToLogFile;
-	private String logFileName = "log.txt";
 	private String downloadBaseFilepath;
 	private HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
 	private ChromeOptions options = new ChromeOptions();
@@ -40,7 +40,8 @@ public class ReportGatherer {
 	private int nameCol;
 	private LoggingTool logger;
 	private Mutex webDriverLock;
-	FileAlterationMonitor monitor;
+	private FileAlterationMonitor monitor;
+	private ArrayList<String> retryList; 
 	
 	/**
 	    * Constructs a ReportGatherer and opens the excel file provided
@@ -72,13 +73,14 @@ public class ReportGatherer {
 		}
 		length = reader.getRows();
 		try{
-			logger = new LoggingTool(pathToLogFile, logFileName);
+			logger = new LoggingTool(pathToLogFile);
 			logger.logInfPrint("Initialized LoggingTool.");
 		}
 		catch(IOException e){
 			throw new IOException("ERROR Couldn't create log file.");
 		}
 		
+		checkAndStoreRetryList();
 		
 	}
 	
@@ -130,7 +132,7 @@ public class ReportGatherer {
 		
 		destroyContext(context);
 		if(!success){
-			logger.logFailPrint(String.valueOf(index));
+			logger.logFailRetryPrint(String.valueOf(index));
 		}
 	}
 	
@@ -460,10 +462,10 @@ public class ReportGatherer {
 		catch(Exception e1){
 			try{
 				context.waitLong.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"downloadbtnOK\"]"))).click();
+				return 0;
 			}
 			catch(Exception e2){
 				logger.logErrPrint(context.ipAddress + " failed to find back button");
-				return 1;
 			}
 		}
 				
@@ -491,6 +493,28 @@ public class ReportGatherer {
 
 	public int length(){
 		return length;
+	}
+	
+	public ArrayList<String> getRetryList(){
+		if(retryList != null){
+			return retryList;
+		}
+		else return null;
+	}
+	
+	private void checkAndStoreRetryList(){
+		try {
+			retryList = logger.getLatestRetry();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean hasRetries(){
+		if(retryList != null && retryList.isEmpty()){
+			return false;
+		}
+		else return true;
 	}
 
 }

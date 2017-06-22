@@ -1,7 +1,9 @@
 package automationFramework;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -23,6 +25,8 @@ public class GetReports {
         if (!workingFolder.exists()) {
             workingFolder.mkdir();
         }
+        
+        
                 
         String downloadBasePath = workingFolder.getAbsolutePath();
 
@@ -30,14 +34,26 @@ public class GetReports {
 		ReportGatherer gatherer;
 		try {
 			gatherer = new ReportGatherer(listOfPrintersPath, downloadBasePath, 4, 6, 7);
-		
-			int totalMFDs = gatherer.length();
 			
-			int startMFD = 1;
-	        final BlockingQueue<Integer> queue = new ArrayBlockingQueue<Integer>(totalMFDs);
-	        for(int currentMFD = startMFD; currentMFD <= totalMFDs; currentMFD++){
-	        	queue.add(currentMFD);
-	        }
+			int totalMFDs = 0;;
+			BlockingQueue<Integer> queue;
+			if(gatherer.hasRetries()){
+				ArrayList<String> list = gatherer.getRetryList();
+				totalMFDs = list.size();
+				queue = new ArrayBlockingQueue<Integer>(totalMFDs);
+				for(int i = 0; i < list.size(); i++){
+					queue.add(Integer.parseInt(list.get(i)));
+				}
+				
+			}
+			else{
+				int startMFD = 1;
+				totalMFDs = gatherer.length();
+				queue = new ArrayBlockingQueue<Integer>(totalMFDs);
+		        for(int currentMFD = startMFD; currentMFD <= totalMFDs; currentMFD++){
+		        	queue.add(currentMFD);
+		        }
+			}
 		
 	        CountDownLatch latch = new CountDownLatch(totalMFDs);
 	        ExecutorService pool = Executors.newFixedThreadPool(MAXCONCURRENTTHREADS);
@@ -61,11 +77,12 @@ public class GetReports {
 			System.out.println("ERROR ExecutorService/CountDownLatch failed.");
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("ERROR Could not initialize gatherer");
 		}
 		
-		
-
 		System.out.println("Retrieval complete.");
-	}	
+	}
+	
+	
 }
