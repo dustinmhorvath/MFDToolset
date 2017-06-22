@@ -1,7 +1,6 @@
 package automationFramework;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -25,9 +24,6 @@ public class GetReports {
         if (!workingFolder.exists()) {
             workingFolder.mkdir();
         }
-        
-        
-                
         String downloadBasePath = workingFolder.getAbsolutePath();
 
 		
@@ -65,7 +61,6 @@ public class GetReports {
 	                }
 	            });
 	        }
-        
         
 	        pool.shutdown();
 	        latch.await();

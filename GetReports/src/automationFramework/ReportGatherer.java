@@ -44,13 +44,13 @@ public class ReportGatherer implements AutoCloseable {
 	private ArrayList<String> retryList = null; 
 	
 	/**
-	    * Constructs a ReportGatherer and opens the excel file provided
-	    * @param String Absolute path, including filename, of the excel sheet
-	    * @param String The root filepath to which reports will be downloaded
-	    * @param Integer The 0-indexed column containing printer IPs
-	    * @param Integer The 0-indexed column containing printer passwords
-	    * @param Integer The 0-indexed column containing printer names
-	    * @throws Exception 
+	    * Constructs a ReportGatherer and opens the excel file provided.
+	    * @param mfdList Absolute path, including filename, of the excel sheet.
+	    * @param basePath The root filepath to which reports will be downloaded.
+	    * @param ipColumnIndex The 0-indexed column containing printer IPs.
+	    * @param pwColumnIndex The 0-indexed column containing printer passwords.
+	    * @param printerColumnIndex The 0-indexed column containing printer names.
+	    * @throws Exception On IO errors, typically due to lack of write privileges.
 	    */
 	public ReportGatherer(String mfdList, String basePath, int ipColumnIndex, int pwColumnIndex, int printerColumnIndex) throws Exception  {
 		ipCol = ipColumnIndex;
@@ -97,7 +97,7 @@ public class ReportGatherer implements AutoCloseable {
 	}
 	
 	/**
-	    * Loads, logs in, navigates, downloads, and logs out from a single MFD, provided via its row index within the excel sheet
+	    * Loads, logs in, navigates, downloads, and logs out from a single MFD, provided via its row index within the excel sheet.
 	    * @param index the row index of the MFD within the excel sheet, starting at index 0, which is row B.
 	    */
 	public void retrieveReportByIndex(int index){
@@ -208,7 +208,8 @@ public class ReportGatherer implements AutoCloseable {
 	}
 	
 	/**
-	    * Destroys the webdriver given a context
+	    * Destroys the webdriver given a context.
+	    * @param context the context to be destroyed.
 	    */
 	private void destroyContext(Context context){
 		context.webDriver.close();
@@ -218,7 +219,7 @@ public class ReportGatherer implements AutoCloseable {
 	/**
 	    *  Loads the login page privided an ip address
 	    *  @param context A context containing relevant printer information
-	    *  @return int returns 0 on success, nonzero on an error
+	    *  @return returns 0 on success, nonzero on an error
 	    */
 	private int preliminary_mfdLoad(Context context){
 		try{
@@ -249,7 +250,7 @@ public class ReportGatherer implements AutoCloseable {
 	/**
 	    * Logs into the printer system page as an administrator
 	    *  @param context A context containing relevant printer information
-	    *  @return int returns 0 on success, nonzero on an error
+	    *  @return returns 0 on success, nonzero on an error
 	    */
 	private int loginPage_mfdLogin(Context context){
 		try{
@@ -285,7 +286,7 @@ public class ReportGatherer implements AutoCloseable {
 	/**
 	    *  Selects the import/export submenu
 	    *  @param context A context containing relevant printer information
-	    *  @return int returns 0 on success, nonzero on an error
+	    *  @return returns 0 on success, nonzero on an error
 	    */
 	private int adminSystemPage_mfdImportExport(Context context){
 		try{
@@ -297,7 +298,6 @@ public class ReportGatherer implements AutoCloseable {
 		}
 		
 		return 0;
-		
 	}
 	
 	/**
@@ -354,7 +354,7 @@ public class ReportGatherer implements AutoCloseable {
 	/**
 	    *  Selects the 'User Counter' export option and clicks 'ok'
 	    *  @param context A context containing relevant printer information
-	    *  @return int returns 0 on success, nonzero on an error
+	    *  @return returns 0 on success, nonzero on an error
 	    */
 	private int counterExportMenu_mfdUserCounterSelection(Context context){
 		// Click on "User Counter"
@@ -383,7 +383,7 @@ public class ReportGatherer implements AutoCloseable {
 	/**
 	    *  Selects the 'Account Counter' export option and clicks 'ok'
 	    *  @param context A context containing relevant printer information
-	    *  @return int returns 0 on success, nonzero on an error
+	    *  @return returns 0 on success, nonzero on an error
 	    */
 	private int counterExportMenu_mfdAccountCounterSelection(Context context){
 		// Click on "User Counter"
@@ -412,7 +412,7 @@ public class ReportGatherer implements AutoCloseable {
 	/**
 	    *  Hits the download button, downloads the file, waits, then hits the back button.
 	    *  @param context A context containing relevant printer information.
-	    *  @return int returns 0 on success, nonzero on an error.
+	    *  @return returns 0 on success, nonzero on an error.
 	    */
 	private int downloadScreen_mfdDownloadButton(Context context){
 		final Boolean[] flag = new Boolean[1];
@@ -476,7 +476,7 @@ public class ReportGatherer implements AutoCloseable {
 	/**
 	    *  Logs out of the current printer.
 	    *  @param context A context containing relevant printer information.
-	    *  @return int returns 0 on success, nonzero on an error
+	    *  @return returns 0 on success, nonzero on an error
 	    */
 	private int mfdLogout(Context context){
 		try{

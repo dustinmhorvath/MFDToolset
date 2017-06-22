@@ -150,7 +150,7 @@ public class LoggingTool {
 		    }
 		}
 		
-		//scanner.close();
+		scanner.close();
 		
 		return retryValues;
 	}
