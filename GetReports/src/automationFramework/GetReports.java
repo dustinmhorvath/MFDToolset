@@ -17,7 +17,7 @@ public class GetReports {
 
 	public static void main(String[] args) {
 		
-		String listOfPrintersPath = "//cfs/it_general/units/ss/ITT2/_s/MFD/Reports/MasterReports_Spreadsheet_Archive/Master_Reports.xlsx";
+		String listOfPrintersFileFullPath = "//cfs/it_general/units/ss/ITT2/_s/MFD/Reports/MasterReports_Spreadsheet_Archive/Master_Reports.xlsx";
 		
 		File currentFolder = new File(".");
         File workingFolder = new File(currentFolder, "Reports-" + LocalDateTime.now().getMonthValue() + "-" + LocalDateTime.now().getDayOfMonth());
@@ -29,7 +29,7 @@ public class GetReports {
 		
 		ReportGatherer gatherer;
 		try {
-			gatherer = new ReportGatherer(listOfPrintersPath, downloadBasePath, 4, 6, 7);
+			gatherer = new ReportGatherer(listOfPrintersFileFullPath, downloadBasePath, 4, 6, 7);
 			
 			int totalMFDs = 0;;
 			BlockingQueue<Integer> queue;
