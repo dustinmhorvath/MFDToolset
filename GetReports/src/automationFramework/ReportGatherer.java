@@ -85,7 +85,7 @@ public class ReportGatherer implements AutoCloseable {
 	}
 	
 	/**
-	    * Closes the monitor and logger.
+	    * Explicitly closes the monitor and logger. Should be called implicitly by AutoCloseable implementation.
 	    */
 	public void close(){
 		try {
@@ -492,10 +492,18 @@ public class ReportGatherer implements AutoCloseable {
 		return 0;
 	}
 
+	/**
+	 * Returns the number of the rows in the Excel sheet provided.
+	 * @return Integer number of rows in the Excel file.
+	 */
 	public int getFileLength(){
 		return length;
 	}
 	
+	/**
+	 * Hands the ArrayList<String> containing the retry file entries up to the caller.
+	 * @return ArrayList containing the contents of the retry file. Returns null if no retry file was found.
+	 */
 	public ArrayList<String> getRetryList(){
 		if(retryList != null){
 			return retryList;
@@ -503,6 +511,9 @@ public class ReportGatherer implements AutoCloseable {
 		else return null;
 	}
 	
+	/**
+	 * Attempts to find the most recent retry file and store its contents in an array list. On failure, leaves the retryList null.
+	 */
 	private void checkAndStoreRetryList(){
 		try {
 			retryList = logger.getLatestRetry();
@@ -511,6 +522,10 @@ public class ReportGatherer implements AutoCloseable {
 		}
 	}
 	
+	/**
+	 * Allows a caller to check whether the ReportGatherer constructor was able to find any entries in the retry file.
+	 * @return Returns a boolean whether the retry file has a nonzero number of entries.
+	 */
 	public boolean hasRetries(){
 		if(retryList == null || retryList.isEmpty()){
 			return false;
