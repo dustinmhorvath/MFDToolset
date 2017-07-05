@@ -3,6 +3,7 @@ package automationFramework;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -32,23 +33,31 @@ public class GetReports {
 			gatherer = new ReportGatherer(listOfPrintersFileFullPath, downloadBasePath, 4, 6, 7);
 			
 			int totalMFDs = 0;;
-			BlockingQueue<Integer> queue;
+			BlockingQueue<Integer> queue = null;
+			String response = "";
+			
+			
+			int startMFD = 1;
+			totalMFDs = gatherer.getFileLength();
+			queue = new ArrayBlockingQueue<Integer>(totalMFDs);
+	        for(int currentMFD = startMFD; currentMFD <= totalMFDs; currentMFD++){
+	        	queue.add(currentMFD);
+	        }
+			
 			if(gatherer.hasRetries()){
 				ArrayList<String> list = gatherer.getRetryList();
-				totalMFDs = list.size();
-				queue = new ArrayBlockingQueue<Integer>(totalMFDs);
-				for(int i = 0; i < list.size(); i++){
-					queue.add(Integer.parseInt(list.get(i)));
+				System.out.print("A retry file was found containing " + list.size() + " entries. Resume ([N]/y)? ");
+				Scanner in = new Scanner(System.in);
+				response = in.nextLine();
+				in.close();
+				if(response.toLowerCase().contains("y")){
+					queue.clear();
+					totalMFDs = list.size();
+					queue = new ArrayBlockingQueue<Integer>(totalMFDs);
+					for(int i = 0; i < list.size(); i++){
+						queue.add(Integer.parseInt(list.get(i)));
+					}
 				}
-				
-			}
-			else{
-				int startMFD = 1;
-				totalMFDs = gatherer.getFileLength();
-				queue = new ArrayBlockingQueue<Integer>(totalMFDs);
-		        for(int currentMFD = startMFD; currentMFD <= totalMFDs; currentMFD++){
-		        	queue.add(currentMFD);
-		        }
 			}
 		
 	        CountDownLatch latch = new CountDownLatch(totalMFDs);
