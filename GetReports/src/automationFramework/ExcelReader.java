@@ -36,8 +36,6 @@ public class ExcelReader {
         }
 
         //showExcelData(sheetData);
-        System.out.println(rows);
-        System.out.println(cols);
     }
     
     
