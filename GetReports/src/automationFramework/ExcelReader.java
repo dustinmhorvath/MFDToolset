@@ -17,7 +17,7 @@ public class ExcelReader {
 	private int cols;
 
 	/**
-	 * Creates an object that can read Excel .xlsx filetypes. Can be used to read cells using row-col coordinates.
+	 * Creates an object that can read Excel .xlsx filetypes. Can be used to read cells using row-col coordinates. In its current implementation, opens the last sheet within the file.
 	 * @param excelFilenameWithPath Absolutely path to the file to be opened, including the filename.
 	 * @throws FileNotFoundException
 	 * @throws IOException
