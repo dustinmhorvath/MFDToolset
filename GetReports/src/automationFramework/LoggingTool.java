@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-public class LoggingTool {
+public class LoggingTool implements AutoCloseable {
 	private String logName = "log.txt";
 	private String logPath;
 	private String logFileWithPath;
@@ -20,6 +20,11 @@ public class LoggingTool {
 	private PrintWriter logWriter;
 	private PrintWriter failWriter;
 	
+	/**
+	 * Instantiates a LoggingTool. Attempts to create a FileWriter and open a new file in the directory provided.
+	 * @param logFilepath Absolute or relative path to the directory to be used for logging.
+	 * @throws IOException Errors if it fails to write on the directory provided, typically due to write permission on the target path.
+	 */
 	public LoggingTool(String logFilepath) throws IOException {
 		this.logPath = logFilepath;
 		this.logFileWithPath = logFilepath + "/" + new Date().getTime() + "-" + logName;
@@ -31,8 +36,12 @@ public class LoggingTool {
 	    }
         FileWriter fwl = new FileWriter( this.logFileWithPath , true);
 		logWriter = new PrintWriter(fwl);
+		logInfPrint("LoggingTool started.");
 	}
 	
+	/**
+	 * Explicitly closes FileWriter objects. Should be called by java AutoCloseable implicitly.
+	 */
 	public void close(){
 		if(logWriter != null){
 			logWriter.close();
@@ -56,8 +65,8 @@ public class LoggingTool {
 	}
 	
 	/**
-	    * Writes a string to the log file and copies output to stdout, using a standard ERR format
-	    * @param logLine the string to be written to the log
+	    * Writes a string to the log file and copies output to stdout, using a standard ERR format.
+	    * @param logLine The string to be written to the log.
 	    */
 	public void logErrPrint(String logLine) {
 		String line = "ERR " + logLine;
@@ -68,6 +77,10 @@ public class LoggingTool {
 		}
 	}
 	
+	/**
+	 * Writes a string to the retry log. This string is implementation-agnostic, but is typically a name or index. It is written only to file, and not copied to stdout.
+	 * @param string The string to be written to the retry file.
+	 */
 	public void logFailRetryPrint(String string) {
 		try {
 			writeToFailLogFile(string);
@@ -89,9 +102,8 @@ public class LoggingTool {
 	}
 
 	/**
-	    * Writes a string to the log file in a standard format
-	    * @param logLine the string to the be written to the log. Will be combined with a prefix so that all log entries are standardized 
-	    *  @return int returns 0 on success, nonzero on an error
+	 * Writes a string to the log file in a standard format.
+	 * @param logLine The string to be written to the log. Will be combined with a prefix so that all log entries are standardized. 
 	 * @throws UnsupportedEncodingException 
 	 * @throws FileNotFoundException 
 	    */
@@ -100,6 +112,11 @@ public class LoggingTool {
 		logWriter.flush();
 	}
 	
+	/**
+	 * Writes a string to the retry log file in a standard format.
+	 * @param logLine The string to be written to the log. Will be combined with a prefix so that all log entries are standardized. 
+	 * @throws IOException
+	 */
 	private void writeToFailLogFile(String logLine) throws IOException{
 		if(failWriter == null){
 			FileWriter fwf = new FileWriter( this.failureLogFileWithPath , true);
@@ -119,7 +136,14 @@ public class LoggingTool {
 		return LocalDateTime.now() + "  : ";
 	}
 	
-	public ArrayList<String> getLatestRetry() throws Exception  {
+	/**
+	 * Automatically looks for the most recent retry file and returns its contents. Throws an exception if a retry
+	 *  file cannot be found.
+	 * @return Returns an ArrayList containing the newline-delimited strings in the retry file. 
+	 * @throws FileNotFoundException Throws an exception if a file cannot be found, or if some other error prevents the retry
+	 *  file from being read.
+	 */
+	public ArrayList<String> getLatestRetry() throws FileNotFoundException   {
 		File folder = new File(logPath);
 		File[] listOfAllLogFiles = folder.listFiles();
 		ArrayList<String> listOfAllRetryFiles = new ArrayList<String>();
